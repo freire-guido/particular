@@ -5,14 +5,16 @@
 
 void gravitate(Particle&a, Particle& b, float cons = 1){
     const sf::Vector2f direction = b.position - a.position;
-    a.accelerate(direction*cons*b.mass / ((a.mass + b.mass)*(a.mass + b.mass)));
-    b.accelerate(-direction*cons*a.mass / ((a.mass + b.mass)*(a.mass + b.mass)));
+    const float radiusSq = ((a.mass + b.mass)*(a.mass + b.mass));
+    a.accelerate(direction*cons*b.mass / radiusSq);
+    b.accelerate(-direction*cons*a.mass / radiusSq);
 }
 
 void collide(Particle& a, Particle& b){
+    const sf::Vector2f direction = b.position - a.position;
     const float constant = dotProduct(a.velocity - b.velocity, a.position - b.position) / (length(a.position - b.position)*length(a.position - b.position));
-    a.speed(-2.0f*(a.position - b.position)*b.mass*constant / (b.mass + a.mass));
-    b.speed(-2.0f*(b.position - a.position)*a.mass*constant / (a.mass + b.mass));
+    a.speed(2.0f*direction*b.mass*constant / (b.mass + a.mass));
+    b.speed(-2.0f*direction*a.mass*constant / (a.mass + b.mass));
 }
 
 bool areColliding(const Particle& a, const Particle& b) {
