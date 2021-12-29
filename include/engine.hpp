@@ -18,9 +18,9 @@ void gravitate(Particle& particle, sf::Vector2f point, float dt = 1, float cons 
 
 void collide(Particle& a, Particle& b) {
     const sf::Vector2f direction = b.position - a.position;
-    const float constant = dotProduct(a.velocity - b.velocity, a.position - b.position) / (length(a.position - b.position)*length(a.position - b.position));
-    a.speed(2.0f*direction*b.mass*constant / (b.mass + a.mass));
-    b.speed(-2.0f*direction*a.mass*constant / (a.mass + b.mass));
+    const float constant = dotProduct(a.velocity - b.velocity, a.position - b.position) / ((b.mass + a.mass)*length(direction)*length(direction));
+    a.speed(2.0f*direction*b.mass*constant);
+    b.speed(-2.0f*direction*a.mass*constant);
 }
 
 bool areColliding(const Particle& a, const Particle& b) {
@@ -43,7 +43,7 @@ struct Engine {
                 }
                 gravitate(particles[i], particles[j], dt, 0.01);
             }
-            gravitate(particles[i], {958, 520}, dt, 0.1);
+            gravitate(particles[i], {958, 520}, dt);
             particles[i].update(dt);
         }
     }
