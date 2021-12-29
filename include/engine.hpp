@@ -34,8 +34,9 @@ struct Engine {
     void render(sf::RenderTarget& target) {
         std::vector<sf::CircleShape> objects(particles.size());
         for (int i = 0; i < particles.size(); i++){
+            sf::Color color(length(particles[i].velocity)*100, 255, 0);
             objects[i].setPosition(particles[i].position);
-            objects[i].setFillColor(sf::Color::White);
+            objects[i].setFillColor(color);
             objects[i].setRadius(particles[i].mass);
             objects[i].setOrigin(particles[i].mass, particles[i].mass);
             target.draw(objects[i]);
