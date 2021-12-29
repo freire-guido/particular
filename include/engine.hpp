@@ -16,7 +16,7 @@ float distance(sf::Vector2f a, sf::Vector2f b) {
 }
 
 void collide(Particle& a, Particle& b){
-    const float constant = dotProduct(a.velocity - b.velocity, a.position - b.position) / length(a.position - b.position)*length(a.position - b.position);
+    const float constant = dotProduct(a.velocity - b.velocity, a.position - b.position) / (length(a.position - b.position)*length(a.position - b.position));
     a.speed(-2.0f*(a.position - b.position)*b.mass*constant / (b.mass + a.mass));
     b.speed(-2.0f*(b.position - a.position)*a.mass*constant / (a.mass + b.mass));
 }
@@ -49,6 +49,7 @@ struct Engine {
             objects[i].setPosition(particles[i].position);
             objects[i].setFillColor(sf::Color::White);
             objects[i].setRadius(particles[i].mass);
+            objects[i].setOrigin(particles[i].mass, particles[i].mass);
             target.draw(objects[i]);
         }
 
