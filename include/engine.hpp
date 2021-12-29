@@ -3,6 +3,12 @@
 #include "particle.hpp"
 #include "math.hpp"
 
+void gravitate(Particle&a, Particle& b, float cons = 1){
+    const sf::Vector2f direction = b.position - a.position;
+    a.accelerate(direction*cons*b.mass / ((a.mass + b.mass)*(a.mass + b.mass)));
+    b.accelerate(-direction*cons*a.mass / ((a.mass + b.mass)*(a.mass + b.mass)));
+}
+
 void collide(Particle& a, Particle& b){
     const float constant = dotProduct(a.velocity - b.velocity, a.position - b.position) / (length(a.position - b.position)*length(a.position - b.position));
     a.speed(-2.0f*(a.position - b.position)*b.mass*constant / (b.mass + a.mass));
@@ -23,12 +29,13 @@ struct Engine {
     }
     void update(float dt) {
         for (int i = 0; i < particles.size(); i++) {
-            particles[i].update(dt);
             for (int j = i + 1; j < particles.size(); j++) {
                 if (areColliding(particles[i], particles[j])) {
                     collide(particles[i], particles[j]);
                 }
+                gravitate(particles[i], particles[j]);
             }
+            particles[i].update(dt);
         }
     }
     void render(sf::RenderTarget& target) {
