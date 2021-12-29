@@ -2,10 +2,9 @@
 #include "../include/engine.hpp"
 
 int main() {
-    Engine engine;
-    engine.add({Particle({0, 0}, {1, 1}, 5), Particle({50, 50}, {-1, -1}, 3)});
-
     int framerate = 60;
+    float mass = 10;
+    Engine engine;
     sf::RenderWindow window(sf::VideoMode(800, 600), "Particular");
     window.setFramerateLimit(framerate);
     while (window.isOpen()) {
@@ -13,6 +12,15 @@ int main() {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
+            }
+            if (event.type == sf::Event::MouseButtonPressed) {
+                engine.add(Particle(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)), mass));
+            }
+            if (event.type == sf::Event::MouseWheelScrolled) {
+                mass += event.mouseWheelScroll.delta;
+                if (mass < 5) {
+                    mass = 5;
+                }
             }
         }
         engine.update(1.0f/framerate);

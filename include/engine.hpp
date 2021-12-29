@@ -33,7 +33,7 @@ struct Engine {
                 if (areColliding(particles[i], particles[j])) {
                     collide(particles[i], particles[j]);
                 }
-                gravitate(particles[i], particles[j]);
+                gravitate(particles[i], particles[j], 0.001);
             }
             particles[i].update(dt);
         }
