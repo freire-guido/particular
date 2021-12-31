@@ -14,7 +14,7 @@ int main() {
                 window.close();
             }
             if (event.type == sf::Event::MouseButtonPressed) {
-                engine.add(Particle(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)), mass));
+                engine.add(Atom(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)), mass));
             }
             if (event.type == sf::Event::MouseWheelScrolled) {
                 mass += event.mouseWheelScroll.delta;

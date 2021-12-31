@@ -28,35 +28,39 @@ bool areColliding(const Particle& a, const Particle& b) {
 }
 
 struct Engine {
-    std::vector<Particle> particles;
-    void add(Particle p) {
-        particles.push_back(p);
+    std::vector<Atom> atoms;
+    void add(Atom& a) {
+        atoms.push_back(a);
     }
-    void add(std::vector<Particle> ps){
-        particles.insert(particles.begin(), ps.begin(), ps.end());
+    void add(std::vector<Atom> as){
+        atoms.insert(atoms.end(), as.begin(), as.end());
     }
     void update(float dt) {
-        for (int i = 0; i < particles.size(); i++) {
-            for (int j = i + 1; j < particles.size(); j++) {
-                if (areColliding(particles[i], particles[j])) {
-                    collide(particles[i], particles[j]);
-                }
-                gravitate(particles[i], particles[j], dt, 0.01);
+        for (Atom& atomA: atoms) {
+            for (Particle* pA: atomA.particles) {
+                for (Atom& atomB: atoms) {
+                    for (Particle* pB: atomB.particles) {
+                        if (areColliding(*pA, *pB)) {
+                            collide(*pA, *pB);
+                        }
+                        gravitate(*pA, *pB, dt, 0.01);
+                    }
+                }  
             }
-            gravitate(particles[i], {958, 520}, dt);
-            particles[i].update(dt);
+            atomA.update(dt);
         }
     }
     void render(sf::RenderTarget& target) {
-        std::vector<sf::CircleShape> objects(particles.size());
-        for (int i = 0; i < particles.size(); i++){
-            sf::Color color(length(particles[i].velocity)*100, 255, 0);
-            objects[i].setPosition(particles[i].position);
-            objects[i].setFillColor(color);
-            objects[i].setRadius(particles[i].mass);
-            objects[i].setOrigin(particles[i].mass, particles[i].mass);
-            target.draw(objects[i]);
+        std::vector<sf::CircleShape> objects(atoms.size());
+        for (int i = 0; i < atoms.size(); i++){
+            for (Particle* p: atoms[i].particles) {
+                sf::Color color(length((*p).velocity)*100, 255, 0);
+                objects[i].setPosition((*p).position);
+                objects[i].setFillColor(color);
+                objects[i].setRadius((*p).mass);
+                objects[i].setOrigin((*p).mass, (*p).mass);
+                target.draw(objects[i]);
+            }
         }
-
     }
 };
