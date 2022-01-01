@@ -20,7 +20,14 @@ struct Atom {
         particles.push_back(new Particle(p, m));
         for (int i = 0; i < m; i++) {
             sf::Vector2f offset(2*m*cos(2*i*M_PI / m), 2*m*sin(2*i*M_PI / m));
-            particles.push_back(new Particle(p + offset, sf::Vector2f(offset.y, -offset.x) / length(offset), -1));
+            particles.push_back(new Particle(p + offset, 2.0f*sf::Vector2f(offset.y, -offset.x), -1));
+        }
+    }
+    Atom(sf::Vector2f p, int m, int e) {
+        particles.push_back(new Particle(p, m));
+        for (int i = 0; i < e; i++) {
+            sf::Vector2f offset(2*m*cos(2*i*M_PI / m), 2*m*sin(2*i*M_PI / m));
+            particles.push_back(new Particle(p + offset, 2.0f*sf::Vector2f(offset.y, -offset.x), -1));
         }
     }
     void speed(sf::Vector2f v) {
