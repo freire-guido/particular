@@ -1,6 +1,6 @@
 #include <SFML/System/Vector2.hpp>
 #include <vector>
-#include "math.h"
+#include "math.hpp"
 
 struct Particle {
     sf::Vector2f position, velocity;

@@ -1,7 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include "particle.hpp"
-#include "math.hpp"
 
 void gravitate(Particle& a, Particle& b, float dt = 1, float cons = 1) {
     const sf::Vector2f direction = b.position - a.position;
