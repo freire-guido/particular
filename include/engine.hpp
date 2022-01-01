@@ -36,21 +36,20 @@ struct Engine {
     }
     void update(float dt) {
         for (int i = 0; i < atoms.size(); i++) {
-            for (Particle* pA: atoms[i].particles) {
+            for (Particle* pi: atoms[i].particles) {
                 for (int j = i + 1; j < atoms.size(); j++) {
-                    for (Particle* pB: atoms[j].particles) {
-                        if (areColliding(*pA, *pB)) {
-                            collide(*pA, *pB);
+                    for (Particle* pj: atoms[j].particles) {
+                        if (areColliding(*pi, *pj)) {
+                            collide(*pi, *pj);
                         }
-                        gravitate(*pA, *pB, dt, 0.01);
+                        gravitate(*pi, *pj, dt);
                     }
                 }
+                pi->update(dt);
             }
-            atoms[i].update(dt);
         }
     }
     void render(sf::RenderTarget& target) {
-        std::vector<sf::CircleShape> objects(atoms.size());
         for (int i = 0; i < atoms.size(); i++){
             for (Particle* p: atoms[i].particles) {
                 sf::CircleShape shape;
