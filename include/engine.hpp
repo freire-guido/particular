@@ -53,12 +53,13 @@ struct Engine {
         std::vector<sf::CircleShape> objects(atoms.size());
         for (int i = 0; i < atoms.size(); i++){
             for (Particle* p: atoms[i].particles) {
-                sf::Color color(length((*p).velocity)*100, 255, 0);
-                objects[i].setPosition((*p).position);
-                objects[i].setFillColor(color);
-                objects[i].setRadius((*p).mass);
-                objects[i].setOrigin((*p).mass, (*p).mass);
-                target.draw(objects[i]);
+                sf::CircleShape shape;
+                sf::Color color(length(p->velocity)*100, 255, 0);
+                shape.setPosition(p->position);
+                shape.setFillColor(color);
+                shape.setRadius(p->mass);
+                shape.setOrigin(p->mass, p->mass);
+                target.draw(shape);
             }
         }
     }
