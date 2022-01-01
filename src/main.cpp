@@ -3,7 +3,7 @@
 
 int main() {
     int framerate = 60;
-    float mass = 10;
+    int mass = 1;
     Engine engine;
     sf::RenderWindow window(sf::VideoMode(800, 600), "Particular");
     window.setFramerateLimit(framerate);
@@ -17,9 +17,9 @@ int main() {
                 engine.add(Atom(static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)), mass));
             }
             if (event.type == sf::Event::MouseWheelScrolled) {
-                mass += event.mouseWheelScroll.delta;
-                if (mass < 5) {
-                    mass = 5;
+                mass++;
+                if (mass < 1) {
+                    mass = 1;
                 }
             }
         }
