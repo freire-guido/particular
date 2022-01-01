@@ -4,9 +4,10 @@
 
 struct Particle {
     sf::Vector2f position, velocity;
-    float mass; // Synonymous with radius in context
-    Particle(sf::Vector2f p, float m): position{p}, mass{m} {}
-    Particle(sf::Vector2f p, sf::Vector2f v, float m): position{p}, velocity{v}, mass{m} {}
+    int charge;
+    Particle(sf::Vector2f p, int c): position{p}, charge{c} {}
+    Particle(sf::Vector2f p, sf::Vector2f v, int c): position{p}, velocity{v}, charge{c} {}
+    float mass() const { return abs(charge); }
     void speed(sf::Vector2f v) { velocity += v; }
     void update(float dt) {
         position += velocity*dt;
@@ -19,7 +20,7 @@ struct Atom {
         particles.push_back(new Particle(p, m));
         for (int i = 0; i < m; i++) {
             sf::Vector2f offset(2*m*cos(2*i*M_PI / m), 2*m*sin(2*i*M_PI / m));
-            particles.push_back(new Particle(p + offset, sf::Vector2f(offset.y, -offset.x) / length(offset), 1));
+            particles.push_back(new Particle(p + offset, sf::Vector2f(offset.y, -offset.x) / length(offset), -1));
         }
     }
     void speed(sf::Vector2f v) {
