@@ -28,25 +28,25 @@ bool areColliding(const Particle& a, const Particle& b) {
 
 struct Engine {
     std::vector<Atom> atoms;
-    void add(Atom& a) {
+    void add(Atom a) {
         atoms.push_back(a);
     }
     void add(std::vector<Atom> as){
         atoms.insert(atoms.end(), as.begin(), as.end());
     }
     void update(float dt) {
-        for (Atom& atomA: atoms) {
-            for (Particle* pA: atomA.particles) {
-                for (Atom& atomB: atoms) {
-                    for (Particle* pB: atomB.particles) {
+        for (int i = 0; i < atoms.size(); i++) {
+            for (Particle* pA: atoms[i].particles) {
+                for (int j = i + 1; j < atoms.size(); j++) {
+                    for (Particle* pB: atoms[j].particles) {
                         if (areColliding(*pA, *pB)) {
                             collide(*pA, *pB);
                         }
                         gravitate(*pA, *pB, dt, 0.01);
                     }
-                }  
+                }
             }
-            atomA.update(dt);
+            atoms[i].update(dt);
         }
     }
     void render(sf::RenderTarget& target) {
