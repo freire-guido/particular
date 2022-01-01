@@ -4,16 +4,16 @@
 
 void gravitate(Particle& a, Particle& b, float dt = 1, float cons = 1) {
     const sf::Vector2f direction = b.position - a.position;
-    const float radiusSq = ((a.mass() + b.mass())*(a.mass() + b.mass()));
-    a.speed(-dt*direction*cons*static_cast<float>(b.charge) / radiusSq);
-    b.speed(dt*direction*cons*static_cast<float>(a.charge) / radiusSq);
+    const float radiusSq = length(direction)*length(direction);
+    a.speed(dt*direction*cons*static_cast<float>(b.charge) / radiusSq);
+    b.speed(-dt*direction*cons*static_cast<float>(a.charge) / radiusSq);
 }
 
-void gravitate(Particle& particle, sf::Vector2f point, float dt = 1, float cons = 1) {
+/**void gravitate(Particle& particle, sf::Vector2f point, float dt = 1, float cons = 1) {
     const sf::Vector2f direction = point - particle.position;
     const float radiusSq = 4*particle.mass()*particle.mass(); // Point mass equal to particle mass
     particle.speed(dt*direction*cons*static_cast<float>(particle.charge) / radiusSq);
-}
+}**/
 
 void collide(Particle& a, Particle& b) {
     const sf::Vector2f direction = b.position - a.position;
@@ -42,7 +42,7 @@ struct Engine {
                         if (areColliding(*atoms[i].particles[j], *atoms[s].particles[t])) {
                             collide(*atoms[i].particles[j], *atoms[s].particles[t]);
                         }
-                        gravitate(*atoms[i].particles[j], *atoms[s].particles[t], dt);
+                        gravitate(*atoms[i].particles[j], *atoms[s].particles[t], dt, 40);
                     }
                 }
                 atoms[i].particles[j]->update(dt);
@@ -53,7 +53,7 @@ struct Engine {
         for (int i = 0; i < atoms.size(); i++){
             for (Particle* p: atoms[i].particles) {
                 sf::CircleShape shape;
-                sf::Color color(length(p->velocity)*100, 255, 0);
+                sf::Color color(p->charge > 0 ? 255 : 0, 0, p->charge > 0 ? 0 : 255);
                 shape.setPosition(p->position);
                 shape.setFillColor(color);
                 shape.setRadius(p->mass());
