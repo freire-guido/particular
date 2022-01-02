@@ -3,7 +3,7 @@
 #include "particle.hpp"
 
 void gravitate(Particle& a, Particle& b, float dt = 1, float cons = 1) {
-    const sf::Vector2f direction = b.position - a.position;
+    const sf::Vector2f direction = normalize(b.position - a.position);
     const float radiusSq = length(direction)*length(direction);
     a.speed(dt*direction*cons*static_cast<float>(b.charge)*b.mass / radiusSq);
     b.speed(-dt*direction*cons*static_cast<float>(a.charge)*a.mass / radiusSq);
@@ -16,7 +16,7 @@ void gravitate(Particle& a, Particle& b, float dt = 1, float cons = 1) {
 }**/
 
 void collide(Particle& a, Particle& b) {
-    const sf::Vector2f direction = b.position - a.position;
+    const sf::Vector2f direction = normalize(b.position - a.position);
     const float constant = dotProduct(a.velocity - b.velocity, a.position - b.position) / ((b.mass + a.mass)*length(direction)*length(direction));
     a.speed(2.0f*direction*b.mass*constant);
     b.speed(-2.0f*direction*a.mass*constant);
@@ -28,6 +28,7 @@ bool areColliding(const Particle& a, const Particle& b) {
 
 struct Engine {
     std::vector<Atom> atoms;
+    bool collisions = false; // Toggle elastic collisions
     void add(Atom a) {
         atoms.push_back(a);
     }
@@ -39,10 +40,10 @@ struct Engine {
             for (int j = 0; j < atoms[i].particles.size(); j++) {
                 for (int s = i; s < atoms.size(); s++) {
                     for (int t = j + 1; t < atoms[s].particles.size(); t++) {
-                        if (areColliding(*atoms[i].particles[j], *atoms[s].particles[t])) {
+                        if (collisions && areColliding(*atoms[i].particles[j], *atoms[s].particles[t])) {
                             collide(*atoms[i].particles[j], *atoms[s].particles[t]);
                         }
-                        gravitate(*atoms[i].particles[j], *atoms[s].particles[t], dt, 40);
+                        gravitate(*atoms[i].particles[j], *atoms[s].particles[t], dt, 31);
                     }
                 }
                 atoms[i].particles[j]->update(dt);
@@ -56,7 +57,7 @@ struct Engine {
                 sf::Color color(p->charge > 0 ? 255 : 0, 0, p->charge > 0 ? 0 : 255);
                 shape.setPosition(p->position);
                 shape.setFillColor(color);
-                shape.setRadius(p->mass);
+                shape.setRadius(1 + p->mass);
                 shape.setOrigin(p->mass, p->mass);
                 target.draw(shape);
             }
