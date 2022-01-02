@@ -5,8 +5,8 @@
 void gravitate(Particle& a, Particle& b, float dt = 1, float cons = 1) {
     const sf::Vector2f direction = b.position - a.position;
     const float radiusSq = length(direction)*length(direction);
-    a.speed(dt*direction*cons*static_cast<float>(b.charge) / radiusSq);
-    b.speed(-dt*direction*cons*static_cast<float>(a.charge) / radiusSq);
+    a.speed(dt*direction*cons*static_cast<float>(b.charge)*b.mass / radiusSq);
+    b.speed(-dt*direction*cons*static_cast<float>(a.charge)*a.mass / radiusSq);
 }
 
 /**void gravitate(Particle& particle, sf::Vector2f point, float dt = 1, float cons = 1) {
@@ -17,13 +17,13 @@ void gravitate(Particle& a, Particle& b, float dt = 1, float cons = 1) {
 
 void collide(Particle& a, Particle& b) {
     const sf::Vector2f direction = b.position - a.position;
-    const float constant = dotProduct(a.velocity - b.velocity, a.position - b.position) / ((b.mass() + a.mass())*length(direction)*length(direction));
-    a.speed(2.0f*direction*b.mass()*constant);
-    b.speed(-2.0f*direction*a.mass()*constant);
+    const float constant = dotProduct(a.velocity - b.velocity, a.position - b.position) / ((b.mass + a.mass)*length(direction)*length(direction));
+    a.speed(2.0f*direction*b.mass*constant);
+    b.speed(-2.0f*direction*a.mass*constant);
 }
 
 bool areColliding(const Particle& a, const Particle& b) {
-    return distance(a.position, b.position) < a.mass() + b.mass();
+    return distance(a.position, b.position) < a.mass + b.mass;
 }
 
 struct Engine {
@@ -56,8 +56,8 @@ struct Engine {
                 sf::Color color(p->charge > 0 ? 255 : 0, 0, p->charge > 0 ? 0 : 255);
                 shape.setPosition(p->position);
                 shape.setFillColor(color);
-                shape.setRadius(p->mass());
-                shape.setOrigin(p->mass(), p->mass());
+                shape.setRadius(p->mass);
+                shape.setOrigin(p->mass, p->mass);
                 target.draw(shape);
             }
         }
