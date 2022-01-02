@@ -9,12 +9,6 @@ void gravitate(Particle& a, Particle& b, float dt = 1, float cons = 1) {
     b.speed(-dt*direction*cons*static_cast<float>(a.charge)*a.mass / radiusSq);
 }
 
-/**void gravitate(Particle& particle, sf::Vector2f point, float dt = 1, float cons = 1) {
-    const sf::Vector2f direction = point - particle.position;
-    const float radiusSq = 4*particle.mass()*particle.mass(); // Point mass equal to particle mass
-    particle.speed(dt*direction*cons*static_cast<float>(particle.charge) / radiusSq);
-}**/
-
 void collide(Particle& a, Particle& b) {
     const sf::Vector2f direction = normalize(b.position - a.position);
     const float constant = dotProduct(a.velocity - b.velocity, a.position - b.position) / ((b.mass + a.mass)*length(direction)*length(direction));
@@ -39,11 +33,13 @@ struct Engine {
         for (int i = 0; i < atoms.size(); i++) {
             for (int j = 0; j < atoms[i].particles.size(); j++) {
                 for (int s = i; s < atoms.size(); s++) {
-                    for (int t = j + 1; t < atoms[s].particles.size(); t++) {
-                        if (collisions && areColliding(*atoms[i].particles[j], *atoms[s].particles[t])) {
-                            collide(*atoms[i].particles[j], *atoms[s].particles[t]);
+                    for (int t = 0; t < atoms[s].particles.size(); t++) {
+                        if (i != s || j != t) {
+                            if (collisions && areColliding(*atoms[i].particles[j], *atoms[s].particles[t])) {
+                                collide(*atoms[i].particles[j], *atoms[s].particles[t]);
+                            }
+                            gravitate(*atoms[i].particles[j], *atoms[s].particles[t], dt, 31);
                         }
-                        gravitate(*atoms[i].particles[j], *atoms[s].particles[t], dt, 31);
                     }
                 }
                 atoms[i].particles[j]->update(dt);
