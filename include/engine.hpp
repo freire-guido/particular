@@ -2,11 +2,13 @@
 #include <vector>
 #include "particle.hpp"
 
-void gravitate(Particle& a, Particle& b, float dt = 1, float cons = 1) {
+float gravitate(Particle& a, Particle& b, float dt = 1, float cons = 1) {
     const sf::Vector2f direction = normalize(b.position - a.position);
     const float radiusSq = length(direction)*length(direction);
-    a.speed(dt*direction*cons*static_cast<float>(b.charge)*b.mass / radiusSq);
-    b.speed(-dt*direction*cons*static_cast<float>(a.charge)*a.mass / radiusSq);
+    const float force = cons*static_cast<float>(a.charge)*a.mass*static_cast<float>(b.charge)*b.mass / radiusSq;
+    a.speed(dt*direction*force / (static_cast<float>(a.charge)*a.mass));
+    b.speed(-dt*direction*force / (static_cast<float>(b.charge)*b.mass));
+    return force;
 }
 
 void collide(Particle& a, Particle& b) {
