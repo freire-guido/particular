@@ -24,7 +24,11 @@ bool areColliding(const Particle& a, const Particle& b) {
 
 struct Engine {
     std::vector<Atom> atoms;
-    bool collisions = false; // Toggle elastic collisions
+    bool collisions; // Toggle elastic collisions
+    sf::VertexArray forces;
+    Engine(bool collisions_ = false): collisions{collisions_} {
+        sf::VertexArray forces(sf::Lines);
+    }
     void add(Atom a) {
         atoms.push_back(a);
     }
@@ -40,15 +44,17 @@ struct Engine {
                             if (collisions && areColliding(*atoms[i].particles[j], *atoms[s].particles[t])) {
                                 collide(*atoms[i].particles[j], *atoms[s].particles[t]);
                             }
-                            gravitate(*atoms[i].particles[j], *atoms[s].particles[t], dt, 31);
+                            float force = gravitate(*atoms[i].particles[j], *atoms[s].particles[t], dt, 10);
                         }
                     }
                 }
+                forces.append(sf::Vertex(atoms[i].particles[j]->position, sf::Color::White));
                 atoms[i].particles[j]->update(dt);
             }
         }
     }
     void render(sf::RenderTarget& target) {
+        target.draw(forces);
         for (int i = 0; i < atoms.size(); i++){
             for (Particle* p: atoms[i].particles) {
                 sf::CircleShape shape;
