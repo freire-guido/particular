@@ -34,7 +34,6 @@ bool areColliding(const Particle& a, const Particle& b) {
 
 struct Engine {
     std::vector<Atom> atoms;
-    sf::VertexArray forces;
     void add(Atom a) {
         atoms.push_back(a);
     }
@@ -70,7 +69,6 @@ struct Engine {
         }
     }
     void render(sf::RenderTarget& target) {
-        target.draw(forces);
         for (int i = 0; i < atoms.size(); i++){
             for (Particle* p: atoms[i].particles) {
                 sf::CircleShape shape;

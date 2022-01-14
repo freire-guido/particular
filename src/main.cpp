@@ -2,12 +2,20 @@
 #include "../include/engine.hpp"
 
 int main() {
-    int framerate = 200;
-    int mass = 1;
-    float dist = 200;
-    Engine engine(true);
+    int framerate = 60;
+    float mass = 0.1;
+    float x_center = 500;
+    float y_center = 500;
+    Engine engine;
+    engine.add(Atom(*new Particle({x_center, y_center + 505}, 500, 0)));
+    for (float i = x_center - 10; i <= x_center + 10; i += 1) {
+        for (float j = y_center - 10; j <= y_center + 10; j += 1) {
+            Atom fluid(*new Particle({i, j}, 0.1, 0));
+            fluid.tag = 1;
+            engine.add(fluid);
+        }
+    }
     sf::RenderWindow window(sf::VideoMode(800, 600), "Particular");
-    //engine.add(Atom(*new Particle({1000, 500}, 1000)));
     window.setFramerateLimit(framerate);
     while (window.isOpen()) {
         sf::Event event;
