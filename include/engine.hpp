@@ -29,16 +29,12 @@ void collide(Particle& a, Particle& b) {
 }
 
 bool areColliding(const Particle& a, const Particle& b) {
-    return distance(a.position, b.position) < a.mass + b.mass;
+    return distance(a.position, b.position) <= a.mass + b.mass;
 }
 
 struct Engine {
     std::vector<Atom> atoms;
-    bool collisions; // Toggle elastic collisions
     sf::VertexArray forces;
-    Engine(bool collisions_ = false): collisions{collisions_} {
-        sf::VertexArray forces(sf::Lines);
-    }
     void add(Atom a) {
         atoms.push_back(a);
     }
@@ -48,18 +44,27 @@ struct Engine {
     void update(float dt) {
         for (int i = 0; i < atoms.size(); i++) {
             for (int j = 0; j < atoms[i].particles.size(); j++) {
-                for (int s = i; s < atoms.size(); s++) {
+                for (int t = j + 1; t < atoms[i].particles.size(); t++) {
+                    if (areColliding(*atoms[i].particles[j], *atoms[i].particles[t])) {
+                        collide(*atoms[i].particles[j], *atoms[i].particles[t]);
+                    }
+                    gravitate(*atoms[i].particles[j], *atoms[i].particles[t], dt, 10);
+                    magnetize(*atoms[i].particles[j], *atoms[i].particles[t], dt, 10);
+                }
+                for (int s = i + 1; s < atoms.size(); s++) {
+                    float interaction = atoms[s].tag == atoms[i].tag ? 100 : 10;
                     for (int t = 0; t < atoms[s].particles.size(); t++) {
-                        if (i != s || j != t) {
-                            if (collisions && areColliding(*atoms[i].particles[j], *atoms[s].particles[t])) {
-                                collide(*atoms[i].particles[j], *atoms[s].particles[t]);
-                            }
-                            gravitate(*atoms[i].particles[j], *atoms[s].particles[t], dt, 1000);
-                            magnetize(*atoms[i].particles[j], *atoms[s].particles[t], dt, 10);
+                        if (areColliding(*atoms[i].particles[j], *atoms[s].particles[t])) {
+                            collide(*atoms[i].particles[j], *atoms[s].particles[t]);
                         }
+                        gravitate(*atoms[i].particles[j], *atoms[s].particles[t], dt, interaction);
+                        magnetize(*atoms[i].particles[j], *atoms[s].particles[t], dt, 10);
                     }
                 }
-                //forces.append(sf::Vertex(atoms[i].particles[j]->position, sf::Color::White));
+            }
+        }
+        for (int i = 0; i < atoms.size(); i++) {
+            for (int j = 0; j < atoms[i].particles.size(); j++) {
                 atoms[i].particles[j]->update(dt);
             }
         }
@@ -69,7 +74,7 @@ struct Engine {
         for (int i = 0; i < atoms.size(); i++){
             for (Particle* p: atoms[i].particles) {
                 sf::CircleShape shape;
-                sf::Color color(p->charge > 0 ? 255 : 0, 0, p->charge > 0 ? 0 : 255);
+                sf::Color color(p->charge > 0 ? 255 : 0, p->charge == 0 ? 255 : 0, p->charge > 0 ? 0 : 255);
                 shape.setPosition(p->position);
                 shape.setFillColor(color);
                 shape.setRadius(1 + p->mass);
