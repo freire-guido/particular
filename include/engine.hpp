@@ -4,16 +4,26 @@
 
 float gravitate(Particle& a, Particle& b, float dt = 1, float cons = 1) {
     const sf::Vector2f direction = normalize(b.position - a.position);
-    const float radiusSq = length(direction)*length(direction);
-    const float force = cons*static_cast<float>(a.charge)*a.mass*static_cast<float>(b.charge)*b.mass / radiusSq;
-    a.speed(-dt*direction*force / a.mass);
-    b.speed(dt*direction*force / b.mass);
+    const float radiusSq = length(b.position - a.position)*length(b.position - a.position);
+    const float force = cons*a.mass*b.mass / radiusSq;
+    a.speed(dt*direction*force / a.mass);
+    b.speed(-dt*direction*force / b.mass);
+    return force;
+}
+
+float magnetize(Particle& a, Particle& b, float dt = 1, float cons = 1) {
+    const sf::Vector2f direction = normalize(b.position - a.position);
+    const float radiusSq = length(b.position - a.position)*length(b.position - a.position);
+    const float force = cons*static_cast<float>(a.charge)*static_cast<float>(b.charge) / radiusSq;
+    a.speed(-dt*direction*force);
+    b.speed(dt*direction*force);
     return force;
 }
 
 void collide(Particle& a, Particle& b) {
-    const sf::Vector2f direction = normalize(b.position - a.position);
-    const float constant = dotProduct(a.velocity - b.velocity, a.position - b.position) / ((b.mass + a.mass)*length(direction)*length(direction));
+    const sf::Vector2f direction = b.position - a.position;
+    const float distanceSq = length(direction)*length(direction);
+    const float constant = dotProduct(a.velocity - b.velocity, a.position - b.position) / ((b.mass + a.mass)*distanceSq);
     a.speed(2.0f*direction*b.mass*constant);
     b.speed(-2.0f*direction*a.mass*constant);
 }
@@ -44,11 +54,12 @@ struct Engine {
                             if (collisions && areColliding(*atoms[i].particles[j], *atoms[s].particles[t])) {
                                 collide(*atoms[i].particles[j], *atoms[s].particles[t]);
                             }
-                            float force = gravitate(*atoms[i].particles[j], *atoms[s].particles[t], dt, 10);
+                            gravitate(*atoms[i].particles[j], *atoms[s].particles[t], dt, 1000);
+                            magnetize(*atoms[i].particles[j], *atoms[s].particles[t], dt, 10);
                         }
                     }
                 }
-                forces.append(sf::Vertex(atoms[i].particles[j]->position, sf::Color::White));
+                //forces.append(sf::Vertex(atoms[i].particles[j]->position, sf::Color::White));
                 atoms[i].particles[j]->update(dt);
             }
         }
