@@ -15,11 +15,14 @@ struct Particle {
 
 struct Atom {
     std::vector<Particle*> particles;
-    Atom(sf::Vector2f p, float m, int e = 0) {
+    Atom(Particle& p) {
+        particles.push_back(&p);
+    }
+    Atom(sf::Vector2f p, float m, int e = 0, float a0 = 0) {
         particles.push_back(new Particle(p, m, 1));
         for (int i = 0; i < e; i++) {
-            sf::Vector2f offset(2*m*cos(2*i*M_PI / e), 2*m*sin(2*i*M_PI / e));
-            particles.push_back(new Particle(p + offset, 1.0f / 1840, -1, sf::Vector2f(offset.y, -offset.x)));
+            sf::Vector2f offset(31*cos(a0 + 2*i*M_PI / e), 31*sin(a0 + 2*i*M_PI / e));
+            particles.push_back(new Particle(p + offset, 1.0f / 1840, -1, 1000.0f / 31 * sf::Vector2f(offset.y, -offset.x)));
         }
     }
     void speed(sf::Vector2f v) {
