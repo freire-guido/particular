@@ -15,6 +15,7 @@ struct Particle {
 
 struct Atom {
     std::vector<Particle*> particles;
+    int tag = 0;
     Atom(Particle& p) {
         particles.push_back(&p);
     }
